@@ -81,11 +81,10 @@ public class Chip8 {
 		this.registers = new short[NUM_REGISTERS];
 		this.memory = new short[MEMORY_SIZE];
 		this.callStack = new int[STACK_DEPTH];
+		this.sp = 0;
 		this.displayMemory = new boolean[DISPLAY_WIDTH][DISPLAY_HEIGHT];
 		
 		LoadFont();
-		
-		this.pc = ROM_START_ADDRESS;
 	}//end constructor method
 	
 	/**Loads ROM data from the provided input file.
@@ -106,6 +105,8 @@ public class Chip8 {
 		catch (FileNotFoundException fnf) {
 			throw new FileNotFoundException("Unable to load ROM file " + file.getName());
 		}//end catch
+		
+		this.pc = ROM_START_ADDRESS;
 	}//end method LoadROM
 	
 	/**Loads the built-in font set into memory.*/
