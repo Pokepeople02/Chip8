@@ -1,6 +1,6 @@
 package chip8;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -14,7 +14,11 @@ public class Driver {
 		
 		Chip8 emulator = new Chip8();
 		try {
-			emulator.LoadROM(new File(args[0]));
+			FileInputStream fs = new FileInputStream(args[0]);
+			byte[] fileContents = fs.readAllBytes();
+			emulator.loadROM(fileContents);
+			while(true)
+				emulator.cycle();
 		}//end try
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
