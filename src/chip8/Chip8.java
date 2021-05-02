@@ -8,6 +8,8 @@ public class Chip8 {
 	protected byte[] memory;
 	protected boolean[][] displayMemory;
 	private Processor cpu;
+	private Keypad keypad;
+	
 	private InstructionTable decoder;
 	
 	public static final int MAIN_MEMORY_SIZE = 4096;
@@ -15,6 +17,8 @@ public class Chip8 {
 	public static final int DISPLAY_WIDTH = 64;
 	public static final int FONT_START_ADDRESS = 0x050;
 	public static final short ROM_START_ADDRESS = 0x200;
+	public static final int SPRITE_WIDTH = 8;
+	public static final int FONT_WIDTH = 5;
 	
 	/**Initializes the emulator and prepares for ROM reading. */
 	public Chip8() {
@@ -62,6 +66,27 @@ public class Chip8 {
 			memory[FONT_START_ADDRESS + i] = (byte)FONT_SET[i];
 	}//end method LoadFont
 	
+	/** Attaches a virtual keypad to the emulated CHIP-8 system.
+	 * @param keypad The keypad to be attached to the CHIP-8.
+	 */
+	public void attachKeypad(Keypad keypad) {
+		this.keypad = keypad;
+	}//end method attachKeypad
+	
+	/**Queries the attached keypad, if one exists, about whether the key with the supplied value is currently being pressed.
+	 * @param requestedKey The byte value of the key to be queried.
+	 * @return True, if the requested key is being pressed. If not, or if no keypad is currently attached, false.
+	 */
+	public boolean queryKeyboard(byte requestedKey) {
+		return (this.keypad != null && this.keypad.isKeyPressed(requestedKey));
+	}//end method queryKeyboard
+	
+	public byte[] queryKeyboard() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/** Completes one cycle of the emulator. Loads the next instruction from memory, decodes it, and executes it. */
 	public void cycle() {
 		short opcode = fetch();
 		cpu.iteratePC();
@@ -74,14 +99,14 @@ public class Chip8 {
 	public short fetch() {
 		return (short) ((this.memory[cpu.getPC()] << 8) | this.memory[cpu.getPC() + 1]);
 	}//end method fetch
+	
+	public Instruction decode(short opcode) {
+		return null;
+	}
 
 	public void execute(Instruction decode) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	public Instruction decode(short opcode) {
-		return null;
 	}
 	
 }//end class Chip8
