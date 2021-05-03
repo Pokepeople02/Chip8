@@ -1,4 +1,4 @@
-package chip8;
+package chip8.emulator;
 
 /**Emulator for the CHIP-8 system.
  * @author Douglas T.

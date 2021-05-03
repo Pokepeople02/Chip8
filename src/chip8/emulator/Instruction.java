@@ -1,4 +1,4 @@
-package chip8;
+package chip8.emulator;
 
 public interface Instruction {
 	

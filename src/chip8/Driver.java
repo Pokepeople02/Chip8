@@ -4,6 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import chip8.emulator.Chip8;
+import chip8.emulator.Keypad;
+
 public class Driver {
 
 	public static void main(String[] args) {
