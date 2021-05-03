@@ -100,13 +100,19 @@ public class Chip8 {
 		return (short) ((this.memory[cpu.getPC()] << 8) | this.memory[cpu.getPC() + 1]);
 	}//end method fetch
 	
+	/**Decodes the given opcode.
+	 * @param opcode The encoded instruction to be decoded
+	 * @return The equivalent Instruction to be executed
+	 */
 	public Instruction decode(short opcode) {
-		return null;
-	}
+		return decoder.getInstruction(opcode);
+	}//end method decode
 
-	public void execute(Instruction decode) {
-		// TODO Auto-generated method stub
-		
-	}
+	/**Executes the provided instruction
+	 * @param instruction The instruction to be executed.
+	 */
+	public void execute(Instruction instruction) {
+		instruction.execute();
+	}//end method execute
 	
 }//end class Chip8

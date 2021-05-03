@@ -16,7 +16,10 @@ public class Driver {
 		try {
 			FileInputStream fs = new FileInputStream(args[0]);
 			byte[] fileContents = fs.readAllBytes();
+			fs.close();
+			
 			emulator.loadROM(fileContents);
+			
 			while(true)
 				emulator.cycle();
 		}//end try
