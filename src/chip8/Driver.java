@@ -19,6 +19,7 @@ public class Driver {
 			fs.close();
 			
 			emulator.loadROM(fileContents);
+			emulator.attachKeypad(new Keypad());
 			
 			while(true)
 				emulator.cycle();
