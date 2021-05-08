@@ -354,7 +354,7 @@ public class Processor {
 	 * @param regX The index of register Vx
 	 */
 	public void skp_Ex9E(int regX) {
-		if(system.queryKeyboard(this.registers[regX]))
+		if(system.queryKeypad(this.registers[regX]))
 			iteratePC();
 	}//end method skp_Ex9E
 	
@@ -363,7 +363,7 @@ public class Processor {
 	 * @param regX The index of register Vx
 	 */
 	public void sknp_ExA1(int regX) {
-		if(!system.queryKeyboard(this.registers[regX]))
+		if(!system.queryKeypad(this.registers[regX]))
 			iteratePC();
 	}//end method sknp_ExA1
 	
@@ -380,7 +380,7 @@ public class Processor {
 	 * @param regX The index of register Vx
 	 */
 	public void ld_Fx0A(int regX) {
-		byte[] keysPressed = system.queryKeyboard();
+		byte[] keysPressed = system.queryKeypad();
 		
 		if(keysPressed.length == 0)
 			repeatPC();

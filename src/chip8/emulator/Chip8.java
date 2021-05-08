@@ -1,5 +1,7 @@
 package chip8.emulator;
 
+import chip8.gui.DisplayVisual;
+
 /**Emulator for the CHIP-8 system.
  * @author Douglas T.
  * Last modified: 4/30/2021
@@ -9,6 +11,8 @@ public class Chip8 {
 	protected boolean[][] displayMemory;
 	private Processor cpu;
 	private Keypad keypad;
+	
+	private DisplayVisual display;
 	
 	private InstructionTable decoder;
 	
@@ -27,6 +31,7 @@ public class Chip8 {
 		
 		this.cpu = new Processor(this);
 		this.decoder = new InstructionTable(cpu);
+		this.display = new DisplayVisual(this);
 		
 		loadFont();
 	}//end constructor method
@@ -77,20 +82,38 @@ public class Chip8 {
 	 * @param requestedKey The byte value of the key to be queried.
 	 * @return True, if the requested key is being pressed. If not, or if no keypad is currently attached, false.
 	 */
-	public boolean queryKeyboard(byte requestedKey) {
+	public boolean queryKeypad(byte requestedKey) {
 		return (this.keypad != null && this.keypad.isKeyPressed(requestedKey));
 	}//end method queryKeyboard
 	
-	public byte[] queryKeyboard() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**Queries the attached keypad, if one exists, about what keys are currently being pressed.
+	 * @return A byte array containing all of the byte values for all currently pressed keys. If no keypad is currently attached, returns an empty array.
+	 */
+	public byte[] queryKeypad() {
+		if(this.keypad == null)
+			return new byte[0];
+		
+		byte[] pressedKeysBuffer = new byte[Keypad.KEYS.length];
+		int numKeysPressed = 0;
+		
+		for(byte keyByte : Keypad.KEYS) {
+			if(queryKeypad(keyByte))
+				pressedKeysBuffer[numKeysPressed++] = keyByte;
+		}//end for
+		
+		byte[] pressedKeys = new byte[numKeysPressed];
+		System.arraycopy(pressedKeysBuffer, 0, pressedKeys, 0, numKeysPressed);
+		
+		return pressedKeys;
+	}//end method queryKeyboard
 	
 	/** Completes one cycle of the emulator. Loads the next instruction from memory, decodes it, and executes it. */
 	public void cycle() {
 		short opcode = fetch();
 		cpu.iteratePC();
 		execute(decode(opcode));
+		
+		display.update();
 	}//end method cycle
 	
 	/**Fetches the next instruction from memory
@@ -114,5 +137,16 @@ public class Chip8 {
 	public void execute(Instruction instruction) {
 		instruction.execute();
 	}//end method execute
+	
+	public DisplayVisual getVisual() {
+		return this.display;
+	}//end method getVisual
+	
+	/**Grabs the current display memory buffer of the emulated CHIP-8 system.
+	 * @return A 2D array containing boolean representations of each pixel, where true indicates the given screen pixel is on and false indicates it is off.
+	 */
+	public boolean[][] getCurrentDisplayBuffer() {
+		return this.displayMemory;
+	}//end method getCurrentDisplayBuffer
 	
 }//end class Chip8
