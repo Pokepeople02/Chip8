@@ -111,14 +111,10 @@ public class InstructionTable {
 		this.table0 = new Hashtable<Integer, InstructionGetter>();
 		
 		//Add $0xx0 instructions
-		InstructionGetter getter0_0 = () ->
-			() -> cpu.cls_00E0();
-		table0.put(0x0, getter0_0);
+		table0.put( 0x0, () -> cpu::cls_00E0 );
 		
 		//Add $0xxE instructions
-		InstructionGetter getter0_E = () ->
-			() -> cpu.ret_00EE();
-		table0.put(0xE, getter0_E);
+		table0.put(0xE, () -> cpu::ret_00EE);
 	}//end method constructTable0
 	
 	/**Constructs the $8xxx instructions sub-table.
