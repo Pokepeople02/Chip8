@@ -46,22 +46,22 @@ public class InstructionMapper {
 
 	/**Constructs the main mapping of instructions to their opcode's most-significant nibble.*/
 	private void constructMainMap() {
-		this.mainMap.put( (byte) 0x0, () -> this.map0.getOrDefault((this.opcode & 0x000F), this.dummy) );	//Map $0xxx instructions
-		this.mainMap.put( (byte) 0x1, this.system::jp_1nnn);												//Map $1xxx instructions
-		this.mainMap.put( (byte) 0x2, this.system::call_2nnn );												//Map $2xxx instructions
-		this.mainMap.put( (byte) 0x3, this.system::se_3xkk );												//Map $3xxx instructions
-		this.mainMap.put( (byte) 0x4, this.system::sne_4xkk );												//Map $4xxx instructions
-		this.mainMap.put( (byte) 0x5, this.system::se_5xy0 );												//Map $5xx0 instructions
-		this.mainMap.put( (byte) 0x6, this.system::ld_6xkk );												//Map $6xxx instructions
-		this.mainMap.put( (byte) 0x7, this.system::add_7xkk );												//Map $7xxx instructions
-		this.mainMap.put( (byte) 0x8, () -> this.map8.getOrDefault((this.opcode & 0x000F), this.dummy) );	//Map $8xxx instructions
-		this.mainMap.put( (byte) 0x9, this.system::sne_9xy0 );												//Map $9xx0 instructions
-		this.mainMap.put( (byte) 0xA, this.system::ld_Annn );												//Map $Axxx instructions
-		this.mainMap.put( (byte) 0xB, this.system::jp_Bnnn );												//Map $Bxxx instructions
-		this.mainMap.put( (byte) 0xC, this.system::rnd_Cxkk );												//Map $Cxxx instructions
-		this.mainMap.put( (byte) 0xC, this.system::drw_Dxyn );												//Map $Dxxx instructions
-		this.mainMap.put( (byte) 0xE, () -> this.mapE.getOrDefault((this.opcode & 0x00FF), this.dummy) );	//Map $Exxx instructions
-		this.mainMap.put( (byte) 0xF, () -> this.mapF.getOrDefault((this.opcode & 0x00FF), this.dummy) );	//Map $Fxxx instructions
+		this.mainMap.put( (byte) 0x0, () -> this.map0.getOrDefault((this.opcode & 0x000F), this.dummy) );		//Map $0xxx instructions
+		this.mainMap.put( (byte) 0x1, this.system::jp_1nnn);													//Map $1xxx instructions
+		this.mainMap.put( (byte) 0x2, this.system::call_2nnn );													//Map $2xxx instructions
+		this.mainMap.put( (byte) 0x3, this.system::se_3xkk );													//Map $3xxx instructions
+		this.mainMap.put( (byte) 0x4, this.system::sne_4xkk );													//Map $4xxx instructions
+		this.mainMap.put( (byte) 0x5, this.system::se_5xy0 );													//Map $5xx0 instructions
+		this.mainMap.put( (byte) 0x6, this.system::ld_6xkk );													//Map $6xxx instructions
+		this.mainMap.put( (byte) 0x7, this.system::add_7xkk );													//Map $7xxx instructions
+		this.mainMap.put( (byte) 0x8, () -> this.map8.getOrDefault((this.opcode & 0x000F), this.dummy) );		//Map $8xxx instructions
+		this.mainMap.put( (byte) 0x9, this.system::sne_9xy0 );													//Map $9xx0 instructions
+		this.mainMap.put( (byte) 0xA, this.system::ld_Annn );													//Map $Axxx instructions
+		this.mainMap.put( (byte) 0xB, this.system::jp_Bnnn );													//Map $Bxxx instructions
+		this.mainMap.put( (byte) 0xC, this.system::rnd_Cxkk );													//Map $Cxxx instructions
+		this.mainMap.put( (byte) 0xC, this.system::drw_Dxyn );													//Map $Dxxx instructions
+		this.mainMap.put( (byte) 0xE, () -> this.mapE.getOrDefault((this.opcode & 0x00FF), this.dummy) );		//Map $Exxx instructions
+		this.mainMap.put( (byte) 0xF, () -> this.mapF.getOrDefault((this.opcode & 0x00FF), this.dummy) );		//Map $Fxxx instructions
 	}//end method constructMainMap
 	
 	/**Constructs the sub-mapping of $00Ex instructions to their opcode's unique least-significant nibble.*/
@@ -72,15 +72,15 @@ public class InstructionMapper {
 	
 	/**Constructs the sub-mapping of $8xxx instructions to their opcode's unique least-significant nibble.*/
 	private void constructMap8() {
-		this.map8.put( (byte) 0x0, this.system::ld_8xy0 );	//Map $8xx0 instructions
-		this.map8.put( (byte) 0x1, this.system::or_8xy1 );	//Map $8xx1 instructions
-		this.map8.put( (byte) 0x2, this.system::and_8xy2 );	//Map $8xx2 instructions
-		this.map8.put( (byte) 0x3, this.system::xor_8xy3 );	//Map $8xx3 instructions
-		this.map8.put( (byte) 0x4, this.system::add_8xy4 );	//Map $8xx4 instructions
-		this.map8.put( (byte) 0x5, this.system::sub_8xy5 );	//Map $8xx5 instructions
-		this.map8.put( (byte) 0x6, this.system::shr_8xy6 );	//Map $8xx6 instructions
-		this.map8.put( (byte) 0x7, this.system::subn_8xy7 );//Map $8xx7 instructions
-		this.map8.put( (byte) 0xE, this.system::shl_8xyE );	//Map $8xxE instructions
+		this.map8.put( (byte) 0x0, this.system::ld_8xy0 );		//Map $8xx0 instructions
+		this.map8.put( (byte) 0x1, this.system::or_8xy1 );		//Map $8xx1 instructions
+		this.map8.put( (byte) 0x2, this.system::and_8xy2 );		//Map $8xx2 instructions
+		this.map8.put( (byte) 0x3, this.system::xor_8xy3 );		//Map $8xx3 instructions
+		this.map8.put( (byte) 0x4, this.system::add_8xy4 );		//Map $8xx4 instructions
+		this.map8.put( (byte) 0x5, this.system::sub_8xy5 );		//Map $8xx5 instructions
+		this.map8.put( (byte) 0x6, this.system::shr_8xy6 );		//Map $8xx6 instructions
+		this.map8.put( (byte) 0x7, this.system::subn_8xy7 );	//Map $8xx7 instructions
+		this.map8.put( (byte) 0xE, this.system::shl_8xyE );		//Map $8xxE instructions
 	}//end method constructTable8
 
 	/**Constructs the sub-mapping of $Exxx instructions to their opcode's unique least-significant byte.*/
@@ -91,15 +91,15 @@ public class InstructionMapper {
 	
 	/**Constructs the sub-mapping of $Fxxx instructions to their opcode's unique least-significant byte.*/
 	private void constructMapF() {
-		this.mapF.put( (byte) 0x07, this.system::ld_Fx07 );	//Map $Fx07 instructions
-		this.mapF.put( (byte) 0x0A, this.system::ld_Fx0A );	//Map $Fx0A instructions
-		this.mapF.put( (byte) 0x15, this.system::ld_Fx15 );	//Map $Fx15 instructions
-		this.mapF.put( (byte) 0x18, this.system::ld_Fx18 );	//Map $Fx18 instructions
-		this.mapF.put( (byte) 0x1E, this.system::add_Fx1E );//Map $Fx1E instructions
-		this.mapF.put( (byte) 0x29, this.system::ld_Fx29 );	//Map $Fx29 instructions
-		this.mapF.put( (byte) 0x33, this.system::ld_Fx33 );	//Map $Fx33 instructions
-		this.mapF.put( (byte) 0x55, this.system::ld_Fx55 );	//Map $Fx55 instructions
-		this.mapF.put( (byte) 0x65, this.system::ld_Fx65 );	//Map $Fx65 instructions
+		this.mapF.put( (byte) 0x07, this.system::ld_Fx07 );		//Map $Fx07 instructions
+		this.mapF.put( (byte) 0x0A, this.system::ld_Fx0A );		//Map $Fx0A instructions
+		this.mapF.put( (byte) 0x15, this.system::ld_Fx15 );		//Map $Fx15 instructions
+		this.mapF.put( (byte) 0x18, this.system::ld_Fx18 );		//Map $Fx18 instructions
+		this.mapF.put( (byte) 0x1E, this.system::add_Fx1E );	//Map $Fx1E instructions
+		this.mapF.put( (byte) 0x29, this.system::ld_Fx29 );		//Map $Fx29 instructions
+		this.mapF.put( (byte) 0x33, this.system::ld_Fx33 );		//Map $Fx33 instructions
+		this.mapF.put( (byte) 0x55, this.system::ld_Fx55 );		//Map $Fx55 instructions
+		this.mapF.put( (byte) 0x65, this.system::ld_Fx65 );		//Map $Fx65 instructions
 	}//end method constructMapF
 
 	/**Gets the appropriate instruction based on the provided opcode.
