@@ -29,7 +29,7 @@ public class InstructionMapper {
 	private final HashMap<Byte, Instruction> mapF = new HashMap<Byte, Instruction>();
 	
 	/** The dummy NOP instruction for handling invalid opcodes */
-	private final Instruction dummy = system::nop_dummy;
+	private final Instruction dummy;
 	
 	/**Creates a new instruction mapper for decoding instructions to be run by the provided emulated CHIP-8 system.
 	 * @param system The emulated CHIP-8 which will carry out all executed decoded instructions
@@ -42,6 +42,8 @@ public class InstructionMapper {
 		constructMap8();
 		constructMapE();
 		constructMapF();
+		
+		this.dummy = system::nop_dummy;
 	}//end constructor method
 
 	/**Constructs the main mapping of instructions to their opcode's most-significant nibble.*/
