@@ -6,5 +6,6 @@ package chip8.emulator;
 public interface Display {
 	
 	public void update();
+	public void scale(int factor);
 	
 }//end interface Display
