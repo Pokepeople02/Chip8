@@ -1,5 +1,8 @@
 package chip8.emulator;
 
+/**Encapsulates individual keypad keys for emulated CHIP-8 keypad.
+ * @author Douglas T. | GitHub: Pokepeople02
+ */
 public class Key {
 
 	private boolean pressed;

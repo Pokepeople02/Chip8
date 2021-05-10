@@ -1,11 +1,14 @@
 package chip8.emulator;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
+/**Virtual keypad for emulated CHIP-8 system. Handles key press/release queries. 
+ * @author Douglas T. | GitHub: Pokepeople02
+ */
 public class Keypad {
 
-	/** Table of keys and their associated byte value */
-	private Hashtable<Byte, Key> keys;
+	/** Mapping of keys and their associated byte value */
+	private HashMap<Byte, Key> keys = new HashMap<Byte, Key>(Keypad.KEYS.length);
 	
 	/** Nonexistent default dummy key to handle invalid key requests */
 	private static final Key dummyKey = new Key();
@@ -20,8 +23,6 @@ public class Keypad {
 	
 	/** Creates a new CHIP-8 keypad */
 	public Keypad() {
-		this.keys = new Hashtable<Byte, Key>();
-		
 		for(byte keyByte : Keypad.KEYS)
 			this.keys.put(keyByte, new Key());
 	}//end constructor method
@@ -31,6 +32,8 @@ public class Keypad {
 	 * @param key The byte value of the key to be pressed.
 	 */
 	public void pressKey(byte key) {
+		System.out.println("Pressing key " + Byte.toUnsignedInt(key));
+		
 		this.keys.getOrDefault(key, dummyKey).press();
 	}//end method pressKey
 	
@@ -39,6 +42,8 @@ public class Keypad {
 	 * @param key The byte value of the key to be released.
 	 */
 	public void releaseKey(byte key) {
+		System.out.println("Releasing key " + Byte.toUnsignedInt(key));
+		
 		this.keys.getOrDefault(keys, dummyKey).release();
 	}//end method releaseKey
 	
@@ -47,8 +52,30 @@ public class Keypad {
 	 * @return True, if the requested key is being pressed. If not, or if no such key exists, returns false.
 	 */
 	public boolean isKeyPressed(byte requestedKey) {
+		System.out.println("Querying key " + Byte.toUnsignedInt(requestedKey) + " for press");
+		
 		Key result = this.keys.get(requestedKey);
 		return (result != null && result.isPressed());
 	}//end method isKeyPressed
+	
+
+	/**Gets all of the keys currently being pressed.
+	 * @return A byte array containing all of the byte values for all currently pressed keys. If no keys are currently pressed, returns an empty array.
+	 * */
+	public byte[] getKeysPressed() {
+		byte[] pressedKeysBuffer = new byte[Keypad.KEYS.length];
+		int numKeysPressed = 0;
+		
+		for(byte keyByte : Keypad.KEYS)
+			if(isKeyPressed(keyByte))
+				pressedKeysBuffer[numKeysPressed++] = keyByte;
+		
+		byte[] pressedKeys = new byte[numKeysPressed];
+		System.arraycopy(pressedKeysBuffer, 0, pressedKeys, 0, numKeysPressed);
+		
+		System.out.println("Pressed keys: " + pressedKeys.toString());
+		
+		return pressedKeys;
+	}//end method queryKeyboard
 
 }//end class Keypad
