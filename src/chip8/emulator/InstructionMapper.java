@@ -111,7 +111,7 @@ public class InstructionMapper {
 	public Instruction getInstruction(short opcode) {
 		this.opcode = opcode;
 		
-		return this.mainMap.getOrDefault( (this.opcode & 0xF000) >>> 16, this.dummy );
+		return this.mainMap.getOrDefault( (byte) ((this.opcode & 0xF000) >>> 12), this.dummy );
 	}//end method getInstruction
 	
 }//end class InstructionMapper
