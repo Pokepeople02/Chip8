@@ -239,7 +239,8 @@ public class Chip8 {
 	private void loadFont() {
 		System.out.println("Attempting to copy font data into memory");
 		
-		System.arraycopy(Chip8.FONT_SET, 0, this.memory, Chip8.FONT_START_ADDRESS, Chip8.FONT_SET.length);
+		for(int i = 0; i < Chip8.FONT_SET.length; ++i)
+			this.memory[Chip8.FONT_START_ADDRESS + i] = (byte) Chip8.FONT_SET[i];
 		
 		System.out.println("Font data successfully copied to memory");
 	}//end method LoadFont
@@ -286,7 +287,7 @@ public class Chip8 {
 			
 			this.stopEmulation();
 			return -1;
-		}
+		}//end try-catch
 	}//end method fetch
 	
 	/**Decodes the given opcode.
