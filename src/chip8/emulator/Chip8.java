@@ -170,6 +170,7 @@ public class Chip8 {
 		//Copy read content to main memory and return success
 		System.out.println("ROM loaded successful, attempting copy to memory");
 		System.arraycopy(fileContents, 0, this.memory, Chip8.ROM_START_ADDRESS, fileContents.length);
+		this.pc = Chip8.ROM_START_ADDRESS;
 		
 		System.out.println("ROM data successfully copied to memory");
 		return true;
@@ -282,8 +283,8 @@ public class Chip8 {
 	private short fetch() {
 		try {
 			return (short) ((this.memory[this.pc] << 8) | this.memory[this.pc + 1]);
-		} catch(NullPointerException npe) {
-			System.out.println("Handled NullPointerException in main memory.");
+		} catch(ArrayIndexOutOfBoundsException oob) {
+			System.out.println("Handled OutOfBoundsException in main memory.");
 			
 			this.stopEmulation();
 			return -1;
