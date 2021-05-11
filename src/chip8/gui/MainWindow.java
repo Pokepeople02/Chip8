@@ -1,7 +1,6 @@
 package chip8.gui;
 
 import javax.swing.JFrame;
-import javax.swing.Timer;
 
 import chip8.emulator.Chip8;
 
@@ -21,7 +20,7 @@ public class MainWindow extends JFrame {
 	 * @param initialScale The initial scale factor for the emulator's display
 	 * @param cycleDelay The delay between emulator cycle executions, in milliseconds
 	 */
-	public MainWindow(String rom, int initialScale, int cycleDelay) {
+	public MainWindow(String rom, int cycleDelay, int initialScale) {
 		super("CHIP-8 Emulator | ROM: " + rom);
 		this.displayScale = initialScale;
 		
