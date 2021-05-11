@@ -1,10 +1,8 @@
 package chip8.gui;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 
