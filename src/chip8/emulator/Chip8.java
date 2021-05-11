@@ -202,7 +202,7 @@ public class Chip8 {
 	
 	/** Completes one cycle of the emulator. Loads the next instruction from memory, decodes it, and executes it, then updates the display. */
 	public void cycle() {
-		System.out.println("Emulator cycle " + this.cycleCount);
+		System.out.println("\nEmulator cycle " + this.cycleCount);
 		
 		//Fetch
 		this.opcode = fetch();
