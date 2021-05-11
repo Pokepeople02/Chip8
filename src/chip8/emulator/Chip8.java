@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import chip8.gui.DisplayVisual;
+import chip8.gui.DisplayPanel;
 
 /**Emulator/interpreter for the CHIP-8 virtual machine.
  * @author Douglas T. | GitHub: Pokepeople02
@@ -46,7 +46,7 @@ public class Chip8 {
 		private Keypad keypad;
 		
 		/** Emulated CHIP-8 64 * 32 pixel display screen */
-		private DisplayVisual display = new DisplayVisual(this);
+		private Display display = new DisplayPanel(this);
 	
 	/* Emulator components for driving CHIP-8 system processes and operations */
 		/** Timer to schedule delay timer decrement every 17 ms (roughly 60 Hz) */
@@ -63,58 +63,56 @@ public class Chip8 {
 		
 		/** The current opcode being executed */
 		private short opcode;
-		
-	/* Other */
-		private long cycleCount;
+
+	private long cycleCount;
+
+	/** The number of bytes available in main memory */
+	public static final short MAIN_MEMORY_SIZE = 4096;
 	
-	/* Constants */
-		/** The number of bytes available in main memory */
-		public static final short MAIN_MEMORY_SIZE = 4096;
-		
-		/** The vertical length of the emulated display */
-		public static final byte DISPLAY_HEIGHT = 32;
-		
-		/** The horizontal length of the emulated display */
-		public static final byte DISPLAY_WIDTH = 64;
-		
-		/** The maximum depth of the call stack */
-		public static final byte CALL_STACK_SIZE = 16;
+	/** The vertical length of the emulated display */
+	public static final byte DISPLAY_HEIGHT = 32;
 	
-		/** The number of general-purpose registers present */
-		public static final byte NUM_REGISTERS = 16;
-		
-		/** The starting address in main memory where the font is loaded */
-		public static final short FONT_START_ADDRESS = 0x050;
-		
-		/** The starting address in main memory where a ROM is to be loaded */
-		public static final short ROM_START_ADDRESS = 0x200;
-		
-		/** The maximum width of a CHIP-8 sprite */
-		private static final byte SPRITE_WIDTH = 8;
-		
-		/** The maximum width of a CHIP-8 font sprite */
-		private static final byte FONT_WIDTH = 5;
-		
-		/**The default CHIP-8 font sprite set of 16 characters (0-9, A-F).<br>
-		 * Stored as a short array for convenience */
-		private static final short[] FONT_SET = {	
-				0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-				0x20, 0x60, 0x20, 0x20, 0x70, // 1
-				0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-				0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-				0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-				0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-				0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-				0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-				0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-				0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-				0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-				0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-				0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-				0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-				0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-				0xF0, 0x80, 0xF0, 0x80, 0x80  // F	
-			};
+	/** The horizontal length of the emulated display */
+	public static final byte DISPLAY_WIDTH = 64;
+	
+	/** The maximum depth of the call stack */
+	public static final byte CALL_STACK_SIZE = 16;
+
+	/** The number of general-purpose registers present */
+	public static final byte NUM_REGISTERS = 16;
+	
+	/** The starting address in main memory where the font is loaded */
+	public static final short FONT_START_ADDRESS = 0x050;
+	
+	/** The starting address in main memory where a ROM is to be loaded */
+	public static final short ROM_START_ADDRESS = 0x200;
+	
+	/** The width of a CHIP-8 sprite */
+	private static final byte SPRITE_WIDTH = 8;
+	
+	/** The width of a CHIP-8 font sprite */
+	private static final byte FONT_WIDTH = 5;
+	
+	/**The default CHIP-8 font sprite set of 16 characters (0-9, A-F).<br>
+	 * Stored as a short array for convenience */
+	private static final short[] FONT_SET = {	
+			0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+			0x20, 0x60, 0x20, 0x20, 0x70, // 1
+			0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+			0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+			0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+			0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+			0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+			0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+			0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+			0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+			0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+			0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+			0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+			0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+			0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+			0xF0, 0x80, 0xF0, 0x80, 0x80  // F	
+		};
 	
 	/**Creates a new CHIP-8 emulator */
 	public Chip8() {
@@ -170,7 +168,7 @@ public class Chip8 {
 	/**Gets the emulated display of the emulator.
 	 * @return A reference to the Display visualizing this emulator's display memory.
 	 */
-	public DisplayVisual getDisplay() {
+	public Display getDisplay() {
 		System.out.println("Getting emulator display");
 		return this.display;
 	}//end method getVisual
