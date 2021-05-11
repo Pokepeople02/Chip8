@@ -28,7 +28,7 @@ public class Chip8Emulator {
 	
 	/** Prints proper command line parameter usage message */
 	private static void printUsageError() {
-		System.out.println("Usage: java " + Chip8Emulator.class.getSimpleName() + " <ROM filename> <Cycle Delay> <Scale factor>");
+		System.out.println("Usage: java " + Chip8Emulator.class.getSimpleName() + " <ROM filename> <Cycle Delay milliseconds> <Scale factor>");
 	}//end method printUsageError
 	
 }//end class Driver
