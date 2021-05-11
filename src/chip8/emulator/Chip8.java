@@ -64,6 +64,16 @@ public class Chip8 {
 		/** The current opcode being executed */
 		private short opcode;
 
+	/** Timer to schedule automatic cycling of emulation */
+	private Timer cycleTimer = new Timer("CycleTimer", false);
+	
+	private TimerTask cycleEmulatorTask = new TimerTask() {
+		@Override
+		public void run() {
+			cycle();
+		}//end method run
+	};
+	
 	private long cycleCount;
 
 	/** The number of bytes available in main memory */
@@ -208,6 +218,23 @@ public class Chip8 {
 		this.cycleCount++;
 	}//end method cycle
 	
+	/** Begins auto-cycling the emulation.
+	 * @param cycleDelay The delay between cycle executions, in milliseconds.
+	 */
+	public void startEmulation(int cycleDelay) {
+		System.out.println("Starting emulation with cycle delay " + cycleDelay);
+		
+		this.cycleTimer.scheduleAtFixedRate(this.cycleEmulatorTask, 0, cycleDelay);
+	}//end method startEmulation
+	
+	/**Stops emulator auto-cycling.*/
+	public void stopEmulation() {
+		System.out.println("Stopping emulation");
+		
+		this.cycleTimer.cancel();
+		this.cycleTimer.purge();
+	}//end method stopEmulation
+	
 	/**Loads the built-in font set into memory.*/
 	private void loadFont() {
 		System.out.println("Attempting to copy font data into memory");
@@ -247,11 +274,19 @@ public class Chip8 {
 		this.soundTimerDecrementer.scheduleAtFixedRate(soundDecrement, 0, 17);
 	}//end method initTimers
 	
-	/**Fetches the next instruction from memory
+	/**Fetches the next instruction from memory.
+	 * Stops emulation if end of memory is reached.
 	 * @return The next two bytes of instructions as a short
 	 */
 	private short fetch() {
-		return (short) ((this.memory[this.pc] << 8) | this.memory[this.pc + 1]);
+		try {
+			return (short) ((this.memory[this.pc] << 8) | this.memory[this.pc + 1]);
+		} catch(NullPointerException npe) {
+			System.out.println("Handled NullPointerException in main memory.");
+			
+			this.stopEmulation();
+			return -1;
+		}
 	}//end method fetch
 	
 	/**Decodes the given opcode.
