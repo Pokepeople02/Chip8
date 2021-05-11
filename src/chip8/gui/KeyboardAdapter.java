@@ -13,6 +13,7 @@ public class KeyboardAdapter extends KeyAdapter {
 	/** Mapping of keyboard key IDs to the byte value of their respective Keypad key */
 	private final HashMap<Integer, Byte> controlMap = new HashMap<Integer, Byte>(Keypad.KEYS.length);
 	
+	/**Creates a new KeyboardAdapter with the default control mapping*/
 	public KeyboardAdapter() {
 		initDefaultControlMap();
 	}//end constructor method
