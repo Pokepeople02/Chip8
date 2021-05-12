@@ -24,15 +24,17 @@ public class MainWindow extends JFrame {
 		super("CHIP-8 Emulator | ROM: " + rom);
 		this.displayScale = initialScale;
 		
-		emulator.attachKeypad(this.emulatorController.getKeypad());
-		emulator.loadROM(rom);
-		
-		this.emulatorDisplay = (DisplayPanel) emulator.getDisplay();
-		this.emulatorDisplay.scale(displayScale);
-		
-		initWindow();
-		
-		emulator.startEmulation(cycleDelay);
+		if( emulator.loadROM(rom) ) {
+			emulator.attachKeypad(this.emulatorController.getKeypad());
+			
+			this.emulatorDisplay = (DisplayPanel) emulator.getDisplay();
+			this.emulatorDisplay.scale(displayScale);
+			
+			initWindow();
+			
+			emulator.startEmulation(cycleDelay);
+		}//end if
+		else System.exit(0);
 	}//end constructor method
 	
 	private void initWindow() {
