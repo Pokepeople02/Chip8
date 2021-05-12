@@ -63,7 +63,14 @@ public class Chip8 {
 		
 		/** The current opcode being executed */
 		private short opcode;
-
+		
+		/* Possible arguments of the current opcode */
+		private byte x;
+		private byte y;
+		private byte n;
+		private byte kk;
+		private short addr;
+		
 	/** Timer to schedule automatic cycling of emulation */
 	private Timer cycleTimer = new Timer("CycleTimer", false);
 	
@@ -126,7 +133,7 @@ public class Chip8 {
 	
 	/**Creates a new CHIP-8 emulator */
 	public Chip8() {
-		System.out.println("Creating new CHIP-8 emulator object");
+		System.out.println("Creating new CHIP-8 emulator");
 		loadFont();
 		initTimers();
 	}//end constructor method
@@ -206,8 +213,9 @@ public class Chip8 {
 		
 		//Fetch
 		this.opcode = fetch();
+		fetchArguments();
 		incrementPC();
-		System.out.println("Fetched opcode " + String.format("0x%04X", this.opcode));
+		System.out.println("Fetched opcode " + String.format("%04X", this.opcode));
 		
 		//Decode and execute
 		execute(decode(this.opcode));
@@ -238,12 +246,12 @@ public class Chip8 {
 	
 	/**Loads the built-in font set into memory.*/
 	private void loadFont() {
-		System.out.println("Attempting to copy font data into memory");
+		System.out.println("Attempting to load font data into memory");
 		
 		for(int i = 0; i < Chip8.FONT_SET.length; ++i)
 			this.memory[Chip8.FONT_START_ADDRESS + i] = (byte) Chip8.FONT_SET[i];
 		
-		System.out.println("Font data successfully copied to memory");
+		System.out.println("Font data successfully loaded to memory");
 	}//end method LoadFont
 	
 	/** Initializes the sound and delay timers */
@@ -282,7 +290,7 @@ public class Chip8 {
 	 */
 	private short fetch() {
 		try {
-			return (short) ((this.memory[this.pc] << 8) | this.memory[this.pc + 1]);
+			return (short) (((this.memory[this.pc] << 8) & 0xFF00) | (this.memory[this.pc + 1] & 0x00FF));
 		} catch(ArrayIndexOutOfBoundsException oob) {
 			System.out.println("Handled OutOfBoundsException in main memory.");
 			
@@ -290,7 +298,7 @@ public class Chip8 {
 			return -1;
 		}//end try-catch
 	}//end method fetch
-	
+
 	/**Decodes the given opcode.
 	 * @param opcode The encoded instruction to be decoded
 	 * @return The equivalent Instruction to be executed
@@ -305,6 +313,15 @@ public class Chip8 {
 	private void execute(Instruction instruction) {
 		instruction.execute();
 	}//end method execute
+	
+	/**Fetches and sets the possible instruction arguments from the current opcode */
+	private void fetchArguments() {
+		this.x = (byte) ((this.opcode & 0x0F00) >>> 8);
+		this.y = (byte) ((this.opcode & 0x00F0) >>> 4);
+		this.n = (byte) (this.opcode & 0x000F);
+		this.kk = (byte) (this.opcode & 0x00FF);
+		this.addr = (short) (this.opcode & 0x0FFF);
+	}//end method fetchArguments
 	
 	/**Increments the PC by two bytes */
 	private void incrementPC() {
@@ -340,8 +357,6 @@ public class Chip8 {
 	 * Jumps to the address indicated by the lower 3 nibbles of the opcode.
 	 */
 	protected void jp_1nnn() {
-		short addr = (short) (this.opcode & 0x0FFF);
-		
 		System.out.println("Executing JP " + Short.toUnsignedInt(addr));
 		
 		this.pc = addr;
@@ -351,8 +366,6 @@ public class Chip8 {
 	 * Calls the subroutine at the address indicated by the lower 3 nibbles of the opcode.
 	 */
 	protected void call_2nnn() {
-		short addr = (short) (this.opcode & 0x0FFF);
-		
 		System.out.println("Executing CALL " + Short.toUnsignedInt(addr));
 		
 		this.callStack[this.sp++] = this.pc;
@@ -363,10 +376,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is equal to byte kk.
 	 */
 	protected void se_3xkk() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte kk = (byte) (this.opcode & 0x00FF);
-		
-		System.out.println("Executing SE V" + Byte.toUnsignedInt(x) + ", " + Byte.toUnsignedInt(kk));
+		System.out.println("Executing SE V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		if(this.registers[x] == kk)
 			incrementPC();
@@ -376,10 +386,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is not equal to byte kk.
 	 */
 	protected void sne_4xkk() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte kk = (byte) (this.opcode & 0x00FF);
-		
-		System.out.println("Executing SNE V" + Byte.toUnsignedInt(x) + ", " + Byte.toUnsignedInt(kk));
+		System.out.println("Executing SNE V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		if(this.registers[x] != kk)
 			incrementPC();
@@ -389,10 +396,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is equal to that in register Vy.
 	 */
 	protected void se_5xy0() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing SE V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing SE V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		if(this.registers[x] == this.registers[y])
 			incrementPC();
@@ -402,10 +406,7 @@ public class Chip8 {
 	 * Loads the value of byte kk into register Vx.
 	 */
 	protected void ld_6xkk() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte kk = (byte) (this.opcode & 0x00FF);
-		
-		System.out.println("Executing LD V" + Byte.toUnsignedInt(x) + ", " + Byte.toUnsignedInt(kk));
+		System.out.println("Executing LD V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		this.registers[x] = kk;
 	}//end method ld_6xkk
@@ -414,10 +415,7 @@ public class Chip8 {
 	 * Adds the byte value kk to the value stored in register Vx.
 	 */
 	protected void add_7xkk() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte kk = (byte) (this.opcode & 0x00FF);
-		
-		System.out.println("Executing ADD V" + Byte.toUnsignedInt(x) + ", " + Byte.toUnsignedInt(kk));
+		System.out.println("Executing ADD V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		this.registers[x] += kk;
 	}//end method add_7xkk
@@ -426,10 +424,7 @@ public class Chip8 {
 	 * Loads the value in register Vy into register Vx.
 	 */
 	protected void ld_8xy0() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing LD V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing LD V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] = this.registers[y];
 	}//end method ld_8xy0
@@ -438,10 +433,7 @@ public class Chip8 {
 	 * Sets register Vx to the value of register Vx OR the value of register Vy.
 	 */
 	protected void or_8xy1() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing OR V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing OR V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] |= this.registers[y];
 	}//end method or_8xy1
@@ -450,10 +442,7 @@ public class Chip8 {
 	 * Sets register Vx to the value of register Vx AND the value of register Vy.
 	 */
 	protected void and_8xy2() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing AND V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing AND V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] &= this.registers[y];
 	}//end method and_8xy2
@@ -462,10 +451,7 @@ public class Chip8 {
 	 * Sets register Vx to the value of register Vx XOR the value of register Vy.
 	 */
 	protected void xor_8xy3() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing XOR V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing XOR V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] ^= this.registers[y];
 	}//end method xor_8xy3
@@ -475,10 +461,7 @@ public class Chip8 {
 	 * Sets register VF to 1 if overflow occurred during the addition. Else, 0.
 	 */
 	protected void add_8xy4() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing ADD V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing ADD V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		short sum = (short) (this.registers[x] + this.registers[y]);
 		this.registers[0xF] = (byte) (sum > 0xFF ? 0x1 : 0x0);
@@ -490,10 +473,7 @@ public class Chip8 {
 	 * Sets register VF to 1 if the value in register Vx is greater than that in Vy. Else, 0.
 	 */
 	protected void sub_8xy5() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing SUB V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing SUB V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[0xF] = (byte) (registers[x] > registers[y] ? 0x1 : 0x0);
 		this.registers[x] -= this.registers[y];
@@ -504,9 +484,7 @@ public class Chip8 {
 	 * Stores the least significant bit of Vx in register VF.
 	 */
 	protected void shr_8xy6() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing SHR V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing SHR V" + String.format("%1X", x));
 		
 		this.registers[0xF] = (byte) (registers[x] & 0x1) ;
 		this.registers[x] >>>= 1;
@@ -517,10 +495,7 @@ public class Chip8 {
 	 * Sets register VF to 1 if the value in register Vy is greater than that in Vx. Else, 0.
 	 */
 	protected void subn_8xy7() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing SUBN V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing SUBN V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[0xF] = (byte) (registers[y] > registers[x] ? 0x1 : 0x0);
 		this.registers[x] = (byte) (registers[y] - registers[x]);
@@ -531,9 +506,7 @@ public class Chip8 {
 	 * Stores the most significant bit of register Vx in register VF.
 	 */
 	protected void shl_8xyE() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing SHL V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing SHL V" + String.format("%1X", x));
 		
 		this.registers[0xF] = (byte) ((registers[x] & 0x80) >>> 7);
 		this.registers[x] <<= 1;
@@ -543,10 +516,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is not equal to that in register Vy.
 	 */
 	protected void sne_9xy0() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		
-		System.out.println("Executing SNE V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y));
+		System.out.println("Executing SNE V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		if(this.registers[x] != this.registers[y])
 			incrementPC();
@@ -556,8 +526,6 @@ public class Chip8 {
 	 * Stores the address supplied into the index register.
 	 */
 	protected void ld_Annn() {
-		short addr = (short) (this.opcode & 0x0FFF);
-		
 		System.out.println("Executing LD I, " + Short.toUnsignedInt(addr));
 		
 		this.index = addr;
@@ -567,8 +535,6 @@ public class Chip8 {
 	 * Sets the program counter to the sum of the address supplied and the value stored in register V0.
 	 */
 	protected void jp_Bnnn() {
-		short addr = (short) (this.opcode & 0x0FFF);
-		
 		System.out.println("Executing JP V0, " + Short.toUnsignedInt(addr));
 		
 		this.pc = (short) (this.registers[0x0] + addr);
@@ -578,10 +544,7 @@ public class Chip8 {
 	 * Stores a random byte AND the supplied byte kk into register Vx.
 	 */
 	protected void rnd_Cxkk() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte kk = (byte) (this.opcode & 0x00FF);
-		
-		System.out.println("Executing RND V" + Byte.toUnsignedInt(x) + ", " + Byte.toUnsignedInt(kk));
+		System.out.println("Executing RND V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		byte[] randByte = new byte[1];
 		this.rand.nextBytes(randByte);
@@ -594,15 +557,13 @@ public class Chip8 {
 	 * Set the value in register VF to 1 if a sprite collision occurred while drawing. Else, 0.
 	 */
 	protected void drw_Dxyn() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		byte y = (byte) (this.opcode & 0x00F0 >>> 4);
-		byte n = (byte) (this.opcode & 0x000F);
-		
-		System.out.println("Executing DRW V" + Byte.toUnsignedInt(x) + ", V" + Byte.toUnsignedInt(y) + ", " + Byte.toUnsignedInt(n));
+		System.out.println("Executing DRW V" + String.format("%1X", x) + ", V" + String.format("%1X", y) + ", " + String.format("%1X", n));
 		
 		//Get sprite x and y positions within the display boundaries, wrapping if beyond display bounds
 		byte xStartPos = (byte) (this.registers[x] % Chip8.DISPLAY_WIDTH);
 		byte yStartPos =  (byte) (this.registers[y] % Chip8.DISPLAY_HEIGHT);
+		
+		System.out.println("Sprite start position: (" + Byte.toUnsignedInt(xStartPos) + ", " + Byte.toUnsignedInt(yStartPos) + ")");
 		
 		this.registers[0xF] = 0x0;
 		//Iterate over 8 columns and n rows of sprite
@@ -610,8 +571,13 @@ public class Chip8 {
 			byte spriteNextByte = this.memory[this.index + row];
 			
 			for(int column = 0; column < Chip8.SPRITE_WIDTH; ++column) {
+				System.out.println("Column: " + column + ", Row: " + row);
+				System.out.println("Current sprite byte: " + String.format("%2X", spriteNextByte));
+				
 				//Isolate the next bit in the next byte of the sprite
-				byte spritePixel = (byte) (spriteNextByte & (0x80 >>> column) >>> Chip8.SPRITE_WIDTH - column); 
+				byte spritePixel = (byte) ((spriteNextByte & (0x80 >>> column)) >>> (Chip8.SPRITE_WIDTH - column - 1));
+				
+				System.out.println("Sprite byte current bit: " + spritePixel);
 				
 				//Get whether the isolated sprite pixel bit is on, and whether the screen pixel is already on.
 				boolean isSpritePixelOn = spritePixel == 0x1;
@@ -619,6 +585,9 @@ public class Chip8 {
 				
 				//Set screen pixel to be on if sprite pixel is on XOR screen pixel was already on
 				this.displayMemory[xStartPos + column][yStartPos + row] = isSpritePixelOn ^ isScreenPixelOn;
+				
+				System.out.println("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
+						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
 				
 				//Set whether a sprite collision occurred
 				if(isSpritePixelOn && isScreenPixelOn)
@@ -633,9 +602,7 @@ public class Chip8 {
 	 * Skips the next instruction if the keypad key with the value in register Vx is being pressed.
 	 */
 	protected void skp_Ex9E() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing SKP V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing SKP V" + String.format("%1X", x));
 		
 		if(this.keypad != null && this.keypad.isKeyPressed(this.registers[x]))
 			incrementPC();
@@ -645,9 +612,7 @@ public class Chip8 {
 	 * Skips the next instruction if the keypad key with the value in register Vx is not being pressed.
 	 */
 	protected void sknp_ExA1() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing SKNP V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing SKNP V" + String.format("%1X", x));
 		
 		if(this.keypad == null || !this.keypad.isKeyPressed(this.registers[x]))
 			incrementPC();
@@ -657,9 +622,7 @@ public class Chip8 {
 	 * Loads the current value of the delay timer into register Vx.
 	 */
 	protected void ld_Fx07() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD V" + Byte.toUnsignedInt(x) + ", DT");
+		System.out.println("Executing LD V" + String.format("%1X", x) + ", DT");
 		
 		this.registers[x] = this.delayTimer;
 	}//end method ld_Fx07
@@ -668,9 +631,7 @@ public class Chip8 {
 	 * Waits for a keypad key to be pressed. Once a key is pressed, loads the byte value of the lowest value pressed key into register Vx.
 	 */
 	protected void ld_Fx0A() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD V" + Byte.toUnsignedInt(x) + ", K");
+		System.out.println("Executing LD V" + String.format("%1X", x) + ", K");
 		
 		byte[] keysPressed = this.keypad.getKeysPressed();
 		//If no keys are pressed, re-run this instruction
@@ -684,9 +645,7 @@ public class Chip8 {
 	 * Loads the current value of register Vx into the delay timer.
 	 */
 	protected void ld_Fx15() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD DT, V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing LD DT, V" + String.format("%1X", x));
 		
 		this.delayTimer = this.registers[x];
 	}//end method ld_Fx15
@@ -695,9 +654,7 @@ public class Chip8 {
 	 * Loads the current value of register Vx into the sound timer.
 	 */
 	protected void ld_Fx18() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD ST, V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing LD ST, V" + String.format("%1X", x));
 		
 		this.soundTimer = this.registers[x];
 	}//end method ld_Fx18
@@ -706,9 +663,7 @@ public class Chip8 {
 	 * Adds the value in register Vx to that in the index register.
 	 */
 	protected void add_Fx1E() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD I, V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing LD I, V" + String.format("%1X", x));
 		
 		this.index += this.registers[x];
 	}//end method add_Fx1E
@@ -717,9 +672,7 @@ public class Chip8 {
 	 * Sets the index register to the address of the sprite for the digit held in register Vx.
 	 */
 	protected void ld_Fx29() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD F, V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing LD F, V" + String.format("%1X", x));
 		
 		this.index = (short) (Chip8.FONT_START_ADDRESS + (Chip8.FONT_WIDTH * this.registers[x]));
 	}//end method ld_Fx29
@@ -728,9 +681,7 @@ public class Chip8 {
 	 * Stores the BCD representation of the value in register Vx into memory, beginning at the address stored in the index register.
 	 */
 	protected void ld_Fx33() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD B, V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing LD B, V" + String.format("%1X", x));
 		
 		byte decimalValue = this.registers[x];
 		for(int i = 2; i >= 0; ++i) {
@@ -743,9 +694,7 @@ public class Chip8 {
 	 * Loads the values in registers V0 through Vx into memory starting at the address stored in the index register.
 	 */
 	protected void ld_Fx55() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD [I], V" + Byte.toUnsignedInt(x));
+		System.out.println("Executing LD [I], V" + String.format("%1X", x));
 		
 		for(int i = 0; i <= x; ++i)
 			this.memory[this.index + i] = this.registers[i];
@@ -755,9 +704,7 @@ public class Chip8 {
 	 * Loads the values in memory starting at the address stored in the index register into registers V0 through Vx.
 	 */
 	protected void ld_Fx65() {
-		byte x = (byte) (this.opcode & 0x0F00 >>> 8);
-		
-		System.out.println("Executing LD V" + Byte.toUnsignedInt(x) + ", [I]");
+		System.out.println("Executing LD V" + String.format("%1X", x) + ", [I]");
 		
 		for(int i = 0; i <= x; ++i)
 			this.registers[i] = this.memory[this.index + i];
@@ -765,7 +712,7 @@ public class Chip8 {
 	
 	/**Dummy instruction for handling invalid opcode requests*/
 	protected void nop_dummy() {
-		System.out.println("Invalid opcode " + String.format("0x%04X", this.opcode));
+		System.out.println("Invalid opcode " + String.format("%04X", this.opcode));
 		System.out.println("Executing NOP as failsafe");
 	}//end method nop_dummy
 	
