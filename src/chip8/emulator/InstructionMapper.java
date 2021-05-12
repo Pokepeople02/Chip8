@@ -48,7 +48,7 @@ public class InstructionMapper {
 
 	/**Constructs the main mapping of instructions to their opcode's most-significant nibble.*/
 	private void constructMainMap() {
-		this.mainMap.put( (byte) 0x0, () -> this.map0.getOrDefault((this.opcode & 0x000F), this.dummy).execute() );	//Map $0xxx instructions
+		this.mainMap.put( (byte) 0x0, () -> this.map0.getOrDefault((byte) (this.opcode & 0x00FF), this.dummy).execute() );	//Map $0xxx instructions
 		this.mainMap.put( (byte) 0x1, this.system::jp_1nnn);												//Map $1xxx instructions
 		this.mainMap.put( (byte) 0x2, this.system::call_2nnn );												//Map $2xxx instructions
 		this.mainMap.put( (byte) 0x3, this.system::se_3xkk );												//Map $3xxx instructions
@@ -66,10 +66,10 @@ public class InstructionMapper {
 		this.mainMap.put( (byte) 0xF, () -> this.mapF.getOrDefault((byte) (this.opcode & 0x00FF), this.dummy).execute() );	//Map $Fxxx instructions
 	}//end method constructMainMap
 	
-	/**Constructs the sub-mapping of $00Ex instructions to their opcode's unique least-significant nibble.*/
+	/**Constructs the sub-mapping of $00Ex instructions to their opcode's unique least-significant byte.*/
 	private void constructMap0() {
-		this.map0.put( (byte) 0x0, this.system::cls_00E0 );	//Map $00E0 instructions
-		this.map0.put( (byte) 0xE, this.system::ret_00EE );	//Map $00EE instructions
+		this.map0.put( (byte) 0xE0, this.system::cls_00E0 );	//Map $00E0 instructions
+		this.map0.put( (byte) 0xEE, this.system::ret_00EE );	//Map $00EE instructions
 	}//end method constructTable0
 	
 	/**Constructs the sub-mapping of $8xxx instructions to their opcode's unique least-significant nibble.*/
