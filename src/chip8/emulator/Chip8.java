@@ -350,7 +350,7 @@ public class Chip8 {
 	protected void ret_00EE() {
 		System.out.println("Executing RET");
 		
-		this.pc = this.callStack[sp--];
+		this.pc = this.callStack[--this.sp];
 	}//end method ret_00EE
 	
 	/**JP addr:<br>
@@ -563,7 +563,7 @@ public class Chip8 {
 		byte xStartPos = (byte) (this.registers[x] % Chip8.DISPLAY_WIDTH);
 		byte yStartPos =  (byte) (this.registers[y] % Chip8.DISPLAY_HEIGHT);
 		
-		System.out.println("Sprite start position: (" + Byte.toUnsignedInt(xStartPos) + ", " + Byte.toUnsignedInt(yStartPos) + ")");
+//		System.out.println("Sprite start position: (" + Byte.toUnsignedInt(xStartPos) + ", " + Byte.toUnsignedInt(yStartPos) + ")");
 		
 		this.registers[0xF] = 0x0;
 		//Iterate over 8 columns and n rows of sprite
@@ -571,13 +571,13 @@ public class Chip8 {
 			byte spriteNextByte = this.memory[this.index + row];
 			
 			for(int column = 0; column < Chip8.SPRITE_WIDTH; ++column) {
-				System.out.println("Column: " + column + ", Row: " + row);
-				System.out.println("Current sprite byte: " + String.format("%2X", spriteNextByte));
+//				System.out.println("Column: " + column + ", Row: " + row);
+//				System.out.println("Current sprite byte: " + String.format("%2X", spriteNextByte));
 				
 				//Isolate the next bit in the next byte of the sprite
 				byte spritePixel = (byte) ((spriteNextByte & (0x80 >>> column)) >>> (Chip8.SPRITE_WIDTH - column - 1));
 				
-				System.out.println("Sprite byte current bit: " + spritePixel);
+//				System.out.println("Sprite byte current bit: " + spritePixel);
 				
 				//Get whether the isolated sprite pixel bit is on, and whether the screen pixel is already on.
 				boolean isSpritePixelOn = spritePixel == 0x1;
@@ -586,8 +586,8 @@ public class Chip8 {
 				//Set screen pixel to be on if sprite pixel is on XOR screen pixel was already on
 				this.displayMemory[xStartPos + column][yStartPos + row] = isSpritePixelOn ^ isScreenPixelOn;
 				
-				System.out.println("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
-						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
+//				System.out.println("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
+//						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
 				
 				//Set whether a sprite collision occurred
 				if(isSpritePixelOn && isScreenPixelOn)
@@ -683,8 +683,8 @@ public class Chip8 {
 	protected void ld_Fx33() {
 		System.out.println("Executing LD B, V" + String.format("%1X", x));
 		
-		byte decimalValue = this.registers[x];
-		for(int i = 2; i >= 0; ++i) {
+		short decimalValue = (short) Byte.toUnsignedInt(this.registers[x]);
+		for(int i = 2; i >= 0; i--) {
 			this.memory[this.index + i] = (byte) (decimalValue % 10);
 			decimalValue /= 10;
 		}//end for
