@@ -32,7 +32,7 @@ public class Keypad {
 	 * @param key The byte value of the key to be pressed.
 	 */
 	public void pressKey(byte key) {
-		System.out.println("Pressing key " + Byte.toUnsignedInt(key));
+//		System.out.println("Pressing key " + Byte.toUnsignedInt(key));
 		
 		this.keys.getOrDefault(key, dummyKey).press();
 	}//end method pressKey
@@ -42,7 +42,7 @@ public class Keypad {
 	 * @param key The byte value of the key to be released.
 	 */
 	public void releaseKey(byte key) {
-		System.out.println("Releasing key " + Byte.toUnsignedInt(key));
+//		System.out.println("Releasing key " + Byte.toUnsignedInt(key));
 		
 		this.keys.getOrDefault(keys, dummyKey).release();
 	}//end method releaseKey
@@ -52,7 +52,7 @@ public class Keypad {
 	 * @return True, if the requested key is being pressed. If not, or if no such key exists, returns false.
 	 */
 	public boolean isKeyPressed(byte requestedKey) {
-		System.out.println("Querying key " + Byte.toUnsignedInt(requestedKey) + " for press");
+//		System.out.println("Querying key " + Byte.toUnsignedInt(requestedKey) + " for press");
 		
 		Key result = this.keys.get(requestedKey);
 		return (result != null && result.isPressed());
