@@ -1,4 +1,4 @@
-package chip8.gui;
+package chip8.ui;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;

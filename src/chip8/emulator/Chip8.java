@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import chip8.gui.DisplayPanel;
+import chip8.ui.DisplayPanel;
 
 /**Emulator/interpreter for the CHIP-8 virtual machine.
  * @author Douglas T. | GitHub: Pokepeople02

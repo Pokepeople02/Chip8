@@ -2,7 +2,7 @@ package chip8;
 
 import javax.swing.SwingUtilities;
 
-import chip8.gui.MainWindow;
+import chip8.ui.MainWindow;
 
 public class Chip8Emulator {
 
