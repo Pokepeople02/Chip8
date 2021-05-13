@@ -581,10 +581,10 @@ public class Chip8 {
 				
 				//Get whether the isolated sprite pixel bit is on, and whether the screen pixel is already on.
 				boolean isSpritePixelOn = spritePixel == 0x1;
-				boolean isScreenPixelOn = this.displayMemory[xStartPos + column][yStartPos + row];
+				boolean isScreenPixelOn = this.displayMemory[(xStartPos + column) % Chip8.DISPLAY_WIDTH][(yStartPos + row) % Chip8.DISPLAY_HEIGHT];
 				
 				//Set screen pixel to be on if sprite pixel is on XOR screen pixel was already on
-				this.displayMemory[xStartPos + column][yStartPos + row] = isSpritePixelOn ^ isScreenPixelOn;
+				this.displayMemory[(xStartPos + column) % Chip8.DISPLAY_WIDTH][(yStartPos + row) % Chip8.DISPLAY_HEIGHT] = isSpritePixelOn ^ isScreenPixelOn;
 				
 //				System.out.println("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
 //						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
@@ -684,6 +684,7 @@ public class Chip8 {
 		System.out.println("Executing LD B, V" + String.format("%1X", x));
 		
 		short decimalValue = (short) Byte.toUnsignedInt(this.registers[x]);
+
 		for(int i = 2; i >= 0; i--) {
 			this.memory[this.index + i] = (byte) (decimalValue % 10);
 			decimalValue /= 10;
