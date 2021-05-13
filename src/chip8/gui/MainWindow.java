@@ -43,6 +43,7 @@ public class MainWindow extends JFrame {
 		isFocused();
 		
 		setContentPane(this.emulatorDisplay);
+		addKeyListener(this.emulatorController);
 		
 		this.pack();
 		this.setVisible(true);
