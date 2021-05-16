@@ -81,7 +81,7 @@ public class Chip8 {
 		}//end method run
 	};
 	
-	private long cycleCount;
+//	private long cycleCount;
 
 	/** The number of bytes available in main memory */
 	public static final short MAIN_MEMORY_SIZE = 4096;
@@ -224,7 +224,7 @@ public class Chip8 {
 		display.update();
 		
 		//Iterate cycle count
-		this.cycleCount++;
+//		this.cycleCount++;
 	}//end method cycle
 	
 	/** Begins auto-cycling the emulation.
