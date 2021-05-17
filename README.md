@@ -1,4 +1,4 @@
-# Chip8emu
+# CHIP-8 Emulator
 <p>
   A CHIP-8 emulator, written in Java.<br>
   Currently command line-only (No GUI) and only tested for use on Windows.
