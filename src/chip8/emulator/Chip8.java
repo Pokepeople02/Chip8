@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import chip8.Chip8Emulator;
 import chip8.ui.DisplayPanel;
 
 /**Emulator/interpreter for the CHIP-8 virtual machine.
@@ -81,7 +82,7 @@ public class Chip8 {
 		}//end method run
 	};
 	
-//	private long cycleCount;
+	private long cycleCount;
 
 	/** The number of bytes available in main memory */
 	public static final short MAIN_MEMORY_SIZE = 4096;
@@ -133,11 +134,11 @@ public class Chip8 {
 	
 	/**Creates a new CHIP-8 emulator */
 	public Chip8() {
-//		System.out.println("Creating new CHIP-8 emulator");
+		Chip8Emulator.debugLog("Creating new CHIP-8 emulator");
 		loadFont();
 		initTimers();
 	}//end constructor method
-	
+
 	/**Loads ROM data into memory from the provided file location.
 	 * @param filename String containing the name and location of the ROM file
 	 * @return True, if the load was successful. If not, false.
@@ -147,7 +148,7 @@ public class Chip8 {
 		
 		try {
 			//Attempt reading supplied file contents
-//			System.out.println("Attempting to load ROM data from file " + filename);
+			Chip8Emulator.debugLog("Attempting to load ROM data from file " + filename);
 			
 			FileInputStream fileReader = new FileInputStream(filename);
 			fileContents = fileReader.readAllBytes();
@@ -175,11 +176,12 @@ public class Chip8 {
 		}//end try-catch
 		
 		//Copy read content to main memory and return success
-//		System.out.println("ROM loaded successful, attempting copy to memory");
+		
+		Chip8Emulator.debugLog("ROM loaded successful, attempting copy to memory");
 		System.arraycopy(fileContents, 0, this.memory, Chip8.ROM_START_ADDRESS, fileContents.length);
 		this.pc = Chip8.ROM_START_ADDRESS;
 		
-//		System.out.println("ROM data successfully copied to memory");
+		Chip8Emulator.debugLog("ROM data successfully copied to memory");
 		return true;
 	}//end method LoadROM
 	
@@ -187,7 +189,7 @@ public class Chip8 {
 	 * @return A reference to the Display visualizing this emulator's display memory.
 	 */
 	public Display getDisplay() {
-//		System.out.println("Getting emulator display");
+		Chip8Emulator.debugLog("Getting emulator display");
 		return this.display;
 	}//end method getVisual
 	
@@ -195,7 +197,7 @@ public class Chip8 {
 	 * @param keypad The keypad to be attached to the CHIP-8.
 	 */
 	public void attachKeypad(Keypad keypad) {
-//		System.out.println("Attaching new emulated keypad");
+		Chip8Emulator.debugLog("Attaching new emulated keypad");
 		this.keypad = keypad;
 	}//end method attachKeypad
 	
@@ -203,19 +205,19 @@ public class Chip8 {
 	 * @return An array containing boolean representations of each pixel, where true indicates the given screen pixel is on and false indicates it is off.
 	 */
 	public boolean[][] getCurrentDisplayBuffer() {
-//		System.out.println("Grabbing the current display buffer");
+		Chip8Emulator.debugLog("Grabbing the current display buffer");
 		return this.displayMemory;
 	}//end method getCurrentDisplayBuffer
 	
 	/** Completes one cycle of the emulator. Loads the next instruction from memory, decodes it, and executes it, then updates the display. */
 	public void cycle() {
-//		System.out.println("\nEmulator cycle " + this.cycleCount);
+		Chip8Emulator.debugLog("\nEmulator cycle " + this.cycleCount);
 		
 		//Fetch
 		this.opcode = fetch();
 		fetchArguments();
 		incrementPC();
-//		System.out.println("Fetched opcode " + String.format("%04X", this.opcode));
+		Chip8Emulator.debugLog("Fetched opcode " + String.format("%04X", this.opcode));
 		
 		//Decode and execute
 		execute(decode(this.opcode));
@@ -224,21 +226,21 @@ public class Chip8 {
 		display.update();
 		
 		//Iterate cycle count
-//		this.cycleCount++;
+		this.cycleCount++;
 	}//end method cycle
 	
 	/** Begins auto-cycling the emulation.
 	 * @param cycleDelay The delay between cycle executions, in milliseconds.
 	 */
 	public void startEmulation(int cycleDelay) {
-//		System.out.println("Starting emulation with cycle delay " + cycleDelay);
+		Chip8Emulator.debugLog("Starting emulation with cycle delay " + cycleDelay);
 		
 		this.cycleTimer.scheduleAtFixedRate(this.cycleEmulatorTask, 0, cycleDelay);
 	}//end method startEmulation
 	
 	/**Stops emulator auto-cycling.*/
 	public void stopEmulation() {
-//		System.out.println("Stopping emulation");
+		Chip8Emulator.debugLog("Stopping emulation");
 		
 		this.cycleTimer.cancel();
 		this.cycleTimer.purge();
@@ -246,38 +248,38 @@ public class Chip8 {
 	
 	/**Loads the built-in font set into memory.*/
 	private void loadFont() {
-//		System.out.println("Attempting to load font data into memory");
+		Chip8Emulator.debugLog("Attempting to load font data into memory");
 		
 		for(int i = 0; i < Chip8.FONT_SET.length; ++i)
 			this.memory[Chip8.FONT_START_ADDRESS + i] = (byte) Chip8.FONT_SET[i];
 		
-//		System.out.println("Font data successfully loaded to memory");
+		Chip8Emulator.debugLog("Font data successfully loaded to memory");
 	}//end method LoadFont
 	
 	/** Initializes the sound and delay timers */
 	private void initTimers() {
 		//Initiate delay timer decrementer
-//		System.out.println("Initializing delay timer");
+		Chip8Emulator.debugLog("Initializing delay timer");
 		TimerTask delayDecrement = new TimerTask() {
 			@Override
 			public void run() {
 				if(delayTimer != 0) {
 					delayTimer--;
-//					System.out.println("Delay timer: " + delayTimer);
+					Chip8Emulator.debugLog("Delay timer: " + delayTimer);
 				}//end if
 			}//end method run
 		};
 		this.delayTimerDecrementer.scheduleAtFixedRate(delayDecrement, 0, 17);
 		
 		//Initiate sound timer decrementer
-//		System.out.println("Initializing sound timer");
+		Chip8Emulator.debugLog("Initializing sound timer");
 		TimerTask soundDecrement = new TimerTask() {
 			@Override
 			public void run() {
 				if(soundTimer != 0) {
 					//TODO implement simple tone when decrement takes place
 					soundTimer--;
-//					System.out.println("Sound timer: " + delayTimer);
+					Chip8Emulator.debugLog("Sound timer: " + delayTimer);
 				}//end if
 			}//end method run
 		};
@@ -292,7 +294,7 @@ public class Chip8 {
 		try {
 			return (short) (((this.memory[this.pc] << 8) & 0xFF00) | (this.memory[this.pc + 1] & 0x00FF));
 		} catch(ArrayIndexOutOfBoundsException oob) {
-			System.out.println("Handled OutOfBoundsException in main memory.");
+			Chip8Emulator.debugLog("Handled OutOfBoundsException in main memory");
 			
 			this.stopEmulation();
 			return -1;
@@ -339,7 +341,7 @@ public class Chip8 {
 	 * Clears the display memory
 	 */
 	protected void cls_00E0() {
-//		System.out.println("Executing CLS");
+		Chip8Emulator.debugLog("Executing CLS");
 		
 		this.displayMemory = new boolean[Chip8.DISPLAY_WIDTH][Chip8.DISPLAY_HEIGHT];
 	}//end method cls_00E0
@@ -348,7 +350,7 @@ public class Chip8 {
 	 * Pops a return address off of the stack and returns to it.
 	 */
 	protected void ret_00EE() {
-//		System.out.println("Executing RET");
+		Chip8Emulator.debugLog("Executing RET");
 		
 		this.pc = this.callStack[--this.sp];
 	}//end method ret_00EE
@@ -357,7 +359,7 @@ public class Chip8 {
 	 * Jumps to the address indicated by the lower 3 nibbles of the opcode.
 	 */
 	protected void jp_1nnn() {
-//		System.out.println("Executing JP " + Short.toUnsignedInt(addr));
+		Chip8Emulator.debugLog("Executing JP " + Short.toUnsignedInt(addr));
 		
 		this.pc = addr;
 	}//end method jp_1nnn
@@ -366,7 +368,7 @@ public class Chip8 {
 	 * Calls the subroutine at the address indicated by the lower 3 nibbles of the opcode.
 	 */
 	protected void call_2nnn() {
-//		System.out.println("Executing CALL " + Short.toUnsignedInt(addr));
+		Chip8Emulator.debugLog("Executing CALL " + Short.toUnsignedInt(addr));
 		
 		this.callStack[this.sp++] = this.pc;
 		this.pc = addr;
@@ -376,7 +378,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is equal to byte kk.
 	 */
 	protected void se_3xkk() {
-//		System.out.println("Executing SE V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
+		Chip8Emulator.debugLog("Executing SE V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		if(this.registers[x] == kk)
 			incrementPC();
@@ -386,7 +388,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is not equal to byte kk.
 	 */
 	protected void sne_4xkk() {
-//		System.out.println("Executing SNE V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
+		Chip8Emulator.debugLog("Executing SNE V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		if(this.registers[x] != kk)
 			incrementPC();
@@ -396,7 +398,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is equal to that in register Vy.
 	 */
 	protected void se_5xy0() {
-//		System.out.println("Executing SE V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing SE V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		if(this.registers[x] == this.registers[y])
 			incrementPC();
@@ -406,7 +408,7 @@ public class Chip8 {
 	 * Loads the value of byte kk into register Vx.
 	 */
 	protected void ld_6xkk() {
-//		System.out.println("Executing LD V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
+		Chip8Emulator.debugLog("Executing LD V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		this.registers[x] = kk;
 	}//end method ld_6xkk
@@ -415,7 +417,7 @@ public class Chip8 {
 	 * Adds the byte value kk to the value stored in register Vx.
 	 */
 	protected void add_7xkk() {
-//		System.out.println("Executing ADD V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
+		Chip8Emulator.debugLog("Executing ADD V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		this.registers[x] += kk;
 	}//end method add_7xkk
@@ -424,7 +426,7 @@ public class Chip8 {
 	 * Loads the value in register Vy into register Vx.
 	 */
 	protected void ld_8xy0() {
-//		System.out.println("Executing LD V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing LD V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] = this.registers[y];
 	}//end method ld_8xy0
@@ -433,7 +435,7 @@ public class Chip8 {
 	 * Sets register Vx to the value of register Vx OR the value of register Vy.
 	 */
 	protected void or_8xy1() {
-//		System.out.println("Executing OR V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing OR V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] |= this.registers[y];
 	}//end method or_8xy1
@@ -442,7 +444,7 @@ public class Chip8 {
 	 * Sets register Vx to the value of register Vx AND the value of register Vy.
 	 */
 	protected void and_8xy2() {
-//		System.out.println("Executing AND V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing AND V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] &= this.registers[y];
 	}//end method and_8xy2
@@ -451,7 +453,7 @@ public class Chip8 {
 	 * Sets register Vx to the value of register Vx XOR the value of register Vy.
 	 */
 	protected void xor_8xy3() {
-//		System.out.println("Executing XOR V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing XOR V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[x] ^= this.registers[y];
 	}//end method xor_8xy3
@@ -461,7 +463,7 @@ public class Chip8 {
 	 * Sets register VF to 1 if overflow occurred during the addition. Else, 0.
 	 */
 	protected void add_8xy4() {
-//		System.out.println("Executing ADD V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing ADD V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		short sum = (short) (this.registers[x] + this.registers[y]);
 		this.registers[0xF] = (byte) (sum > 0xFF ? 0x1 : 0x0);
@@ -473,7 +475,7 @@ public class Chip8 {
 	 * Sets register VF to 1 if the value in register Vx is greater than that in Vy. Else, 0.
 	 */
 	protected void sub_8xy5() {
-//		System.out.println("Executing SUB V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing SUB V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[0xF] = (byte) (registers[x] > registers[y] ? 0x1 : 0x0);
 		this.registers[x] -= this.registers[y];
@@ -484,7 +486,7 @@ public class Chip8 {
 	 * Stores the least significant bit of Vx in register VF.
 	 */
 	protected void shr_8xy6() {
-//		System.out.println("Executing SHR V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing SHR V" + String.format("%1X", x));
 		
 		this.registers[0xF] = (byte) (registers[x] & 0x1) ;
 		this.registers[x] >>>= 1;
@@ -495,7 +497,7 @@ public class Chip8 {
 	 * Sets register VF to 1 if the value in register Vy is greater than that in Vx. Else, 0.
 	 */
 	protected void subn_8xy7() {
-//		System.out.println("Executing SUBN V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing SUBN V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		this.registers[0xF] = (byte) (registers[y] > registers[x] ? 0x1 : 0x0);
 		this.registers[x] = (byte) (registers[y] - registers[x]);
@@ -506,7 +508,7 @@ public class Chip8 {
 	 * Stores the most significant bit of register Vx in register VF.
 	 */
 	protected void shl_8xyE() {
-//		System.out.println("Executing SHL V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing SHL V" + String.format("%1X", x));
 		
 		this.registers[0xF] = (byte) ((registers[x] & 0x80) >>> 7);
 		this.registers[x] <<= 1;
@@ -516,7 +518,7 @@ public class Chip8 {
 	 * Skips the next instruction if the value in register Vx is not equal to that in register Vy.
 	 */
 	protected void sne_9xy0() {
-//		System.out.println("Executing SNE V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
+		Chip8Emulator.debugLog("Executing SNE V" + String.format("%1X", x) + ", V" + String.format("%1X", y));
 		
 		if(this.registers[x] != this.registers[y])
 			incrementPC();
@@ -526,7 +528,7 @@ public class Chip8 {
 	 * Stores the address supplied into the index register.
 	 */
 	protected void ld_Annn() {
-//		System.out.println("Executing LD I, " + Short.toUnsignedInt(addr));
+		Chip8Emulator.debugLog("Executing LD I, " + Short.toUnsignedInt(addr));
 		
 		this.index = addr;
 	}//end method ld_Annn
@@ -535,7 +537,7 @@ public class Chip8 {
 	 * Sets the program counter to the sum of the address supplied and the value stored in register V0.
 	 */
 	protected void jp_Bnnn() {
-//		System.out.println("Executing JP V0, " + Short.toUnsignedInt(addr));
+		Chip8Emulator.debugLog("Executing JP V0, " + Short.toUnsignedInt(addr));
 		
 		this.pc = (short) (this.registers[0x0] + addr);
 	}//end method jp_Bnnn
@@ -544,7 +546,7 @@ public class Chip8 {
 	 * Stores a random byte AND the supplied byte kk into register Vx.
 	 */
 	protected void rnd_Cxkk() {
-//		System.out.println("Executing RND V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
+		Chip8Emulator.debugLog("Executing RND V" + String.format("%1X", x) + ", " + Byte.toUnsignedInt(kk));
 		
 		byte[] randByte = new byte[1];
 		this.rand.nextBytes(randByte);
@@ -557,13 +559,13 @@ public class Chip8 {
 	 * Set the value in register VF to 1 if a sprite collision occurred while drawing. Else, 0.
 	 */
 	protected void drw_Dxyn() {
-//		System.out.println("Executing DRW V" + String.format("%1X", x) + ", V" + String.format("%1X", y) + ", " + String.format("%1X", n));
+		Chip8Emulator.debugLog("Executing DRW V" + String.format("%1X", x) + ", V" + String.format("%1X", y) + ", " + String.format("%1X", n));
 		
 		//Get sprite x and y positions within the display boundaries, wrapping if beyond display bounds
 		byte xStartPos = (byte) (this.registers[x] % Chip8.DISPLAY_WIDTH);
 		byte yStartPos =  (byte) (this.registers[y] % Chip8.DISPLAY_HEIGHT);
 		
-//		System.out.println("Sprite start position: (" + Byte.toUnsignedInt(xStartPos) + ", " + Byte.toUnsignedInt(yStartPos) + ")");
+		Chip8Emulator.debugLog("Sprite start position: (" + Byte.toUnsignedInt(xStartPos) + ", " + Byte.toUnsignedInt(yStartPos) + ")");
 		
 		this.registers[0xF] = 0x0;
 		//Iterate over 8 columns and n rows of sprite
@@ -571,13 +573,13 @@ public class Chip8 {
 			byte spriteNextByte = this.memory[this.index + row];
 			
 			for(int column = 0; column < Chip8.SPRITE_WIDTH; ++column) {
-//				System.out.println("Column: " + column + ", Row: " + row);
-//				System.out.println("Current sprite byte: " + String.format("%2X", spriteNextByte));
+				Chip8Emulator.debugLog("Column: " + column + ", Row: " + row);
+				Chip8Emulator.debugLog("Current sprite byte: " + String.format("%2X", spriteNextByte));
 				
 				//Isolate the next bit in the next byte of the sprite
 				byte spritePixel = (byte) ((spriteNextByte & (0x80 >>> column)) >>> (Chip8.SPRITE_WIDTH - column - 1));
 				
-//				System.out.println("Sprite byte current bit: " + spritePixel);
+				Chip8Emulator.debugLog("Sprite byte current bit: " + spritePixel);
 				
 				//Get whether the isolated sprite pixel bit is on, and whether the screen pixel is already on.
 				boolean isSpritePixelOn = spritePixel == 0x1;
@@ -586,8 +588,8 @@ public class Chip8 {
 				//Set screen pixel to be on if sprite pixel is on XOR screen pixel was already on
 				this.displayMemory[(xStartPos + column) % Chip8.DISPLAY_WIDTH][(yStartPos + row) % Chip8.DISPLAY_HEIGHT] = isSpritePixelOn ^ isScreenPixelOn;
 				
-//				System.out.println("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
-//						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
+				Chip8Emulator.debugLog("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
+						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
 				
 				//Set whether a sprite collision occurred
 				if(isSpritePixelOn && isScreenPixelOn)
@@ -602,7 +604,7 @@ public class Chip8 {
 	 * Skips the next instruction if the keypad key with the value in register Vx is being pressed.
 	 */
 	protected void skp_Ex9E() {
-//		System.out.println("Executing SKP V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing SKP V" + String.format("%1X", x));
 		
 		if(this.keypad != null && this.keypad.isKeyPressed(this.registers[x]))
 			incrementPC();
@@ -612,7 +614,7 @@ public class Chip8 {
 	 * Skips the next instruction if the keypad key with the value in register Vx is not being pressed.
 	 */
 	protected void sknp_ExA1() {
-//		System.out.println("Executing SKNP V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing SKNP V" + String.format("%1X", x));
 		
 		if(this.keypad == null || !this.keypad.isKeyPressed(this.registers[x]))
 			incrementPC();
@@ -622,7 +624,7 @@ public class Chip8 {
 	 * Loads the current value of the delay timer into register Vx.
 	 */
 	protected void ld_Fx07() {
-//		System.out.println("Executing LD V" + String.format("%1X", x) + ", DT");
+		Chip8Emulator.debugLog("Executing LD V" + String.format("%1X", x) + ", DT");
 		
 		this.registers[x] = this.delayTimer;
 	}//end method ld_Fx07
@@ -631,7 +633,7 @@ public class Chip8 {
 	 * Waits for a keypad key to be pressed. Once a key is pressed, loads the byte value of the lowest value pressed key into register Vx.
 	 */
 	protected void ld_Fx0A() {
-//		System.out.println("Executing LD V" + String.format("%1X", x) + ", K");
+		Chip8Emulator.debugLog("Executing LD V" + String.format("%1X", x) + ", K");
 		
 		byte[] keysPressed = this.keypad.getKeysPressed();
 		//If no keys are pressed, re-run this instruction
@@ -645,7 +647,7 @@ public class Chip8 {
 	 * Loads the current value of register Vx into the delay timer.
 	 */
 	protected void ld_Fx15() {
-//		System.out.println("Executing LD DT, V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing LD DT, V" + String.format("%1X", x));
 		
 		this.delayTimer = this.registers[x];
 	}//end method ld_Fx15
@@ -654,7 +656,7 @@ public class Chip8 {
 	 * Loads the current value of register Vx into the sound timer.
 	 */
 	protected void ld_Fx18() {
-//		System.out.println("Executing LD ST, V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing LD ST, V" + String.format("%1X", x));
 		
 		this.soundTimer = this.registers[x];
 	}//end method ld_Fx18
@@ -663,7 +665,7 @@ public class Chip8 {
 	 * Adds the value in register Vx to that in the index register.
 	 */
 	protected void add_Fx1E() {
-//		System.out.println("Executing LD I, V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing LD I, V" + String.format("%1X", x));
 		
 		this.index += this.registers[x];
 	}//end method add_Fx1E
@@ -672,7 +674,7 @@ public class Chip8 {
 	 * Sets the index register to the address of the sprite for the digit held in register Vx.
 	 */
 	protected void ld_Fx29() {
-//		System.out.println("Executing LD F, V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing LD F, V" + String.format("%1X", x));
 		
 		this.index = (short) (Chip8.FONT_START_ADDRESS + (Chip8.FONT_WIDTH * this.registers[x]));
 	}//end method ld_Fx29
@@ -681,7 +683,7 @@ public class Chip8 {
 	 * Stores the BCD representation of the value in register Vx into memory, beginning at the address stored in the index register.
 	 */
 	protected void ld_Fx33() {
-//		System.out.println("Executing LD B, V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing LD B, V" + String.format("%1X", x));
 		
 		short decimalValue = (short) Byte.toUnsignedInt(this.registers[x]);
 
@@ -695,7 +697,7 @@ public class Chip8 {
 	 * Loads the values in registers V0 through Vx into memory starting at the address stored in the index register.
 	 */
 	protected void ld_Fx55() {
-//		System.out.println("Executing LD [I], V" + String.format("%1X", x));
+		Chip8Emulator.debugLog("Executing LD [I], V" + String.format("%1X", x));
 		
 		for(int i = 0; i <= x; ++i)
 			this.memory[this.index + i] = this.registers[i];
@@ -705,7 +707,7 @@ public class Chip8 {
 	 * Loads the values in memory starting at the address stored in the index register into registers V0 through Vx.
 	 */
 	protected void ld_Fx65() {
-//		System.out.println("Executing LD V" + String.format("%1X", x) + ", [I]");
+		Chip8Emulator.debugLog("Executing LD V" + String.format("%1X", x) + ", [I]");
 		
 		for(int i = 0; i <= x; ++i)
 			this.registers[i] = this.memory[this.index + i];
@@ -713,8 +715,7 @@ public class Chip8 {
 	
 	/**Dummy instruction for handling invalid opcode requests*/
 	protected void nop_dummy() {
-		System.out.println("Invalid opcode " + String.format("%04X", this.opcode));
-//		System.out.println("Executing NOP as failsafe");
+		Chip8Emulator.debugLog("Invalid opcode " + String.format("%04X", this.opcode));
 	}//end method nop_dummy
 	
 }//end class Chip8
