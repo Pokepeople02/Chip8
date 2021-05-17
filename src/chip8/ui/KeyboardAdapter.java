@@ -74,13 +74,15 @@ public class KeyboardAdapter extends KeyAdapter {
 	/** Sends key press request to the associated emulated Keypad */
 	@Override
 	public void keyPressed(KeyEvent e) {
-		this.emulatedKeypad.pressKey(this.controlMap.get(e.getKeyCode()));
+		if(this.controlMap.containsKey(e.getKeyCode()))
+			this.emulatedKeypad.pressKey(this.controlMap.get(e.getKeyCode()));
 	}//end method keyPressed
 	
 	/** Sends key release request to the associated emulated Keypad */
 	@Override
 	public void keyReleased(KeyEvent e) {
-		this.emulatedKeypad.releaseKey(this.controlMap.get(e.getKeyCode()));
+		if(this.controlMap.containsKey(e.getKeyCode()))
+			this.emulatedKeypad.releaseKey(this.controlMap.get(e.getKeyCode()));
 	}//end method keyPressed
 	
 }//end class KeyboardAdapter
