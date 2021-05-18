@@ -573,13 +573,13 @@ public class Chip8 {
 			byte spriteNextByte = this.memory[this.index + row];
 			
 			for(int column = 0; column < Chip8.SPRITE_WIDTH; ++column) {
-				Chip8Emulator.debugLog("Column: " + column + ", Row: " + row);
-				Chip8Emulator.debugLog("Current sprite byte: " + String.format("%2X", spriteNextByte));
+//				Chip8Emulator.debugLog("Column: " + column + ", Row: " + row);
+//				Chip8Emulator.debugLog("Current sprite byte: " + String.format("%2X", spriteNextByte));
 				
 				//Isolate the next bit in the next byte of the sprite
 				byte spritePixel = (byte) ((spriteNextByte & (0x80 >>> column)) >>> (Chip8.SPRITE_WIDTH - column - 1));
 				
-				Chip8Emulator.debugLog("Sprite byte current bit: " + spritePixel);
+//				Chip8Emulator.debugLog("Sprite byte current bit: " + spritePixel);
 				
 				//Get whether the isolated sprite pixel bit is on, and whether the screen pixel is already on.
 				boolean isSpritePixelOn = spritePixel == 0x1;
