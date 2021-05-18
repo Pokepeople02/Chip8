@@ -589,7 +589,7 @@ public class Chip8 {
 				this.displayMemory[(xStartPos + column) % Chip8.DISPLAY_WIDTH][(yStartPos + row) % Chip8.DISPLAY_HEIGHT] = isSpritePixelOn ^ isScreenPixelOn;
 				
 				Chip8Emulator.debugLog("Setting pixel " + (xStartPos + column) + ", " + (yStartPos + row)
-						+ " to " + (this.displayMemory[xStartPos + column][yStartPos + row] ? "ON" : "OFF"));
+						+ " to " + (this.displayMemory[(xStartPos + column) % Chip8.DISPLAY_WIDTH][(yStartPos + row) % Chip8.DISPLAY_HEIGHT] ? "ON" : "OFF"));
 				
 				//Set whether a sprite collision occurred
 				if(isSpritePixelOn && isScreenPixelOn)
