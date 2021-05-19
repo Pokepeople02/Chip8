@@ -2,6 +2,8 @@ package chip8.emulator;
 
 import java.util.HashMap;
 
+import chip8.Chip8Emulator;
+
 /**Virtual keypad for emulated CHIP-8 system. Handles key press/release queries. 
  * @author Douglas T. | GitHub: Pokepeople02
  */
@@ -32,7 +34,7 @@ public class Keypad {
 	 * @param key The byte value of the key to be pressed.
 	 */
 	public void pressKey(byte key) {
-//		System.out.println("Pressing key " + Byte.toUnsignedInt(key));
+		Chip8Emulator.debugLog("Pressing key " + Byte.toUnsignedInt(key));
 		
 		this.keys.getOrDefault(key, dummyKey).press();
 	}//end method pressKey
@@ -42,20 +44,18 @@ public class Keypad {
 	 * @param key The byte value of the key to be released.
 	 */
 	public void releaseKey(byte key) {
-//		System.out.println("Releasing key " + Byte.toUnsignedInt(key));
+		Chip8Emulator.debugLog("Releasing key " + Byte.toUnsignedInt(key));
 		
-		this.keys.getOrDefault(keys, dummyKey).release();
+		this.keys.getOrDefault(key, dummyKey).release();
 	}//end method releaseKey
 	
 	/**Gets whether the key associated with the provided byte value is currently pressed.
 	 * @param requestedKey The byte value of the key to be queried
 	 * @return True, if the requested key is being pressed. If not, or if no such key exists, returns false.
 	 */
-	public boolean isKeyPressed(byte requestedKey) {
-//		System.out.println("Querying key " + Byte.toUnsignedInt(requestedKey) + " for press");
-		
-		Key result = this.keys.get(requestedKey);
-		return (result != null && result.isPressed());
+	public boolean isKeyPressed(byte requestedKey) {	
+		Key result = this.keys.getOrDefault(requestedKey, Keypad.dummyKey);
+		return (result != Keypad.dummyKey && result.isPressed());
 	}//end method isKeyPressed
 	
 
@@ -66,14 +66,19 @@ public class Keypad {
 		byte[] pressedKeysBuffer = new byte[Keypad.KEYS.length];
 		int numKeysPressed = 0;
 		
-		for(byte keyByte : Keypad.KEYS)
-			if(isKeyPressed(keyByte))
+		for(byte keyByte : Keypad.KEYS) {
+			if(isKeyPressed(keyByte)) {
+				Chip8Emulator.debugLog("Key " + keyByte + " is pressed");
+				
 				pressedKeysBuffer[numKeysPressed++] = keyByte;
+			}//end if
+			else
+				Chip8Emulator.debugLog("Key " + keyByte + " is not pressed");
+		}//end for
+				
 		
 		byte[] pressedKeys = new byte[numKeysPressed];
 		System.arraycopy(pressedKeysBuffer, 0, pressedKeys, 0, numKeysPressed);
-		
-		System.out.println("Pressed keys: " + pressedKeys.toString());
 		
 		return pressedKeys;
 	}//end method queryKeyboard
