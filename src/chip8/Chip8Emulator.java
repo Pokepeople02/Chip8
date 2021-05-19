@@ -24,7 +24,7 @@ public class Chip8Emulator {
 	private static final int DEFAULT_DISPLAY_SCALE = 10;
 	private static final int DEFAULT_CYCLE_SPEED = 10;
 	private static final PrintStream DEFAULT_TRACE_STREAM = System.out;
-	private static final boolean DEFAULT_VERBOSE_FLAG = true; //TODO: Change verbose default to false for release
+	private static final boolean DEFAULT_VERBOSE_FLAG = false;
 
 	/**Creates a new CHIP-8 emulator using the supplied command line arguments to supply the location of the ROM to be loaded.
 	 * @param args Command line arguments to be parsed
