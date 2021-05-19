@@ -195,12 +195,12 @@ public class Chip8Emulator {
 	private static void printUsage() {
 		System.out.println("Usage: Chip8Emulator \"FILE\" [-d display-scale] [-c cycle-speed] [-v | --not-verbose] [-o output-file | --output output-file] [--help]");
 		
-		System.out.println("\tFILE : The filename of the ROM to be loaded");
+		System.out.println("\tFILE : The filename of the ROM to be loaded.");
 		System.out.println("\t[-d display-scale] : Specifies integer initial scale factor for the CHIP-8's display. Defaults to " + DEFAULT_DISPLAY_SCALE + " if not provided.");
 		System.out.println("\t[-c cycle-speed] : Specifies integer delay between emulation cycles in milliseconds. Defaults to " + DEFAULT_CYCLE_SPEED + " if not provided.");
-		System.out.println("\t[-v | --not-verbose] : Optionally specifies whether verbose debugging mode should be enabled");
+		System.out.println("\t[-v | --not-verbose] : Optionally specifies whether verbose debugging mode should be enabled. Defaults to " + DEFAULT_VERBOSE_FLAG + " if not provided.");
 		System.out.println("\t[-o output-file] : Optionally specifies an output text file for logging debug statements. Defaults to stdout if not provided.");
-		System.out.println("\t[--help] : Prints this message");
+		System.out.println("\t[--help] : Prints this message.");
 	}//end method printUsageError
 	
 }//end class Chip8Emulator
