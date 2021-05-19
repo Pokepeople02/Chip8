@@ -160,17 +160,14 @@ public class Chip8 {
 				throw new OutOfMemoryError("Supplied file " + filename + " too large to fit into CHIP-8 memory");
 		} catch(FileNotFoundException fnf) {
 			System.err.println("ROM load failed: Requested file " + filename + " could not be found.");
-			fnf.printStackTrace();
 			
 			return false;
 		} catch(IOException io) {
 			System.err.println("ROM load failed: IO Exception occurred during read.");
-			io.printStackTrace();
 			
 			return false;
 		} catch(OutOfMemoryError oom) {
 			System.err.println("ROM load failed: Invalid file size for a CHIP-8 ROM.");
-			oom.printStackTrace();
 			
 			return false;
 		}//end try-catch
