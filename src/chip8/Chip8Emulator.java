@@ -58,25 +58,17 @@ public class Chip8Emulator {
 		if(romFilename.equals(""))
 			missingROMFilename();
 		
-		if(displayScale == -1) {
-//			System.out.println("Defaulting to display-scale " + DEFAULT_DISPLAY_SCALE);
+		if(displayScale == -1)
 			displayScale = DEFAULT_DISPLAY_SCALE;
-		}//end if
 		
-		if(cycleSpeed == -1) {
-//			System.out.println("Defaulting to cycle-speed " + DEFAULT_CYCLE_SPEED);
+		if(cycleSpeed == -1)
 			cycleSpeed = DEFAULT_CYCLE_SPEED;
-		}//end if
 		
-		if(verboseFlag == null) {
-//			System.out.println("Defaulting to verbose " + DEFAULT_VERBOSE_FLAG);
+		if(verboseFlag == null)
 			verboseFlag = DEFAULT_VERBOSE_FLAG;
-		}//end if
 		
-		if(outputFilename.equals("")) {
-//			System.out.println("Defaulting to output-stream stdout");
+		if(outputFilename.equals(""))
 			traceStream = DEFAULT_TRACE_STREAM;
-		}//end if
 	}//end method validateArguments
 	
 	/** Alerts the user that they are missing the required ROM filename argument, and exits.*/
@@ -116,7 +108,7 @@ public class Chip8Emulator {
 		try {
 			traceStream = new PrintStream(outputFilename);
 		} catch(FileNotFoundException e) {
-			System.err.println("Unable to create or open file \"" + outputFilename + "\", defaulting to stdout.");
+			System.err.println("Unable to create or open file \"" + outputFilename + "\", defaulting to Standard Out.");
 			traceStream = DEFAULT_TRACE_STREAM;
 		}//end try-catch
 	}//end method prepOutputStream
@@ -193,13 +185,15 @@ public class Chip8Emulator {
 
 	/** Prints proper command line parameter usage message */
 	private static void printUsage() {
-		System.out.println("Usage: Chip8Emulator \"FILE\" [-d display-scale] [-c cycle-speed] [-v | --not-verbose] [-o output-file | --output output-file] [--help]");
+		System.out.println("Usage: Chip8Emulator \"FILE\" [-c cycle-speed] [-d display-scale] [-v | --not-verbose] [-o output-file] [--help]");
 		
 		System.out.println("\tFILE : The filename of the ROM to be loaded.");
-		System.out.println("\t[-d display-scale] : Specifies integer initial scale factor for the CHIP-8's display. Defaults to " + DEFAULT_DISPLAY_SCALE + " if not provided.");
-		System.out.println("\t[-c cycle-speed] : Specifies integer delay between emulation cycles in milliseconds. Defaults to " + DEFAULT_CYCLE_SPEED + " if not provided.");
-		System.out.println("\t[-v | --not-verbose] : Optionally specifies whether verbose debugging mode should be enabled. Defaults to " + DEFAULT_VERBOSE_FLAG + " if not provided.");
-		System.out.println("\t[-o output-file] : Optionally specifies an output text file for logging debug statements. Defaults to stdout if not provided.");
+		
+		System.out.println("Optional:");
+		System.out.println("\t[-d display-scale] : Integer initial factor to scale the CHIP-8's 64x32 display. Default: " + DEFAULT_DISPLAY_SCALE);
+		System.out.println("\t[-c cycle-speed] : Integer delay between emulation cycles, in milliseconds. Default: " + DEFAULT_CYCLE_SPEED);
+		System.out.println("\t[-v | --not-verbose] : Whether verbose debugging mode should be enabled. Default: " + DEFAULT_VERBOSE_FLAG);
+		System.out.println("\t[-o output-file] : Output file location for logging debug statements. Default: Standard Out");
 		System.out.println("\t[--help] : Prints this message.");
 	}//end method printUsageError
 	
